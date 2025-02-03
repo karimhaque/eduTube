@@ -1,0 +1,24 @@
+{
+    "manifest_version": 2,
+    "name": "eduTube",
+    "description": "Block out Entertainment on YouTube",
+    "version": "1.0",
+    "permissions": [
+      "activeTab",
+      "https://www.googleapis.com/*"
+    ],
+    "background": {
+      "scripts": ["popup.js"],
+      "persistent": false
+    },
+    "browser_action": {
+      "default_popup": "hello.html"
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://www.youtube.com/watch*"],
+        "js": ["content.js"]
+      }
+    ]
+  }
+  
