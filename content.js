@@ -1,17 +1,25 @@
-// content.js
-const videoId = window.location.search.split('v=')[1].split('&')[0];
-console.log(videoId);  // Debugging line
+function getVideoId() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get("v");
+}
 
-const apiKey = 'AIzaSyB6mVkJ6WOXF7WDlJY0HlrC4x1dd8EvKWg'; // Replace with your API Key
+function sendVideoId() {
+  const videoId = getVideoId();
+  if (videoId) {
+    chrome.runtime.sendMessage({ videoId: videoId });
+  }
+}
 
-// Request to YouTube API to fetch video details
-fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`)
-  .then(response => response.json())
-  .then(data => {
-    if (data.items.length > 0) {
-      const videoTitle = data.items[0].snippet.title;
-      // Send the title to popup.js
-      chrome.runtime.sendMessage({ title: videoTitle });
-    }
-  })
-  .catch(err => console.error('Error fetching video title:', err));
+// Detect URL changes using MutationObserver
+let lastUrl = location.href;
+const observer = new MutationObserver(() => {
+  if (location.href !== lastUrl) {
+    lastUrl = location.href;
+    sendVideoId();
+  }
+});
+
+observer.observe(document, { childList: true, subtree: true });
+
+// Initial check in case the script loads late
+sendVideoId();
